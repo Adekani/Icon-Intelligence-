@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Assistant</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f9fafb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #111827;
+        }
+
+        /* Chat Window Container */
+        .chat-container {
+            width: 100%;
+            max-width: 440px;
+            height: 600px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin: 20px;
+        }
+
+        /* Header Accent */
+        .chat-header {
+            padding: 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+        }
+
+        .chat-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        /* Message Thread Area */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background-color: #fafafa;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        /* User Message Styling */
+        .message.user {
+            background-color: #111827;
+            color: #ffffff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Bot Message Styling */
+        .message.bot {
+            background-color: #ffffff;
+            color: #111827;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+
+        /* Typing/Loading Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+
+        /* Footer Input Area */
+        .chat-input-area {
+            padding: 16px;
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .chat-form {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: #111827;
+        }
+
+        .send-btn {
+            background: #111827;
+            color: #ffffff;
+            border: none;
+            padding: 0 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #1f2937;
+        }
+
+        .send-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="status-dot"></div>
+            <h2>Customer Assistant</h2>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                Hello! How can I help you today?
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <form class="chat-form" id="chatForm">
+                <input 
+                    type="text" 
+                    id="userInput" 
+                    class="chat-input" 
+                    placeholder="Type your message..." 
+                    autocomplete="off" 
+                    required
+                >
+                <button type="submit" id="sendBtn" class="send-btn">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const WEBHOOK_URL = 'https://fancy-dolphin-76.ash-2.instapods.app/webhook/tola-website-widget';
+        
+        // Generate a simple unique session ID per page load so n8n can track individual chat threads if needed
+        const sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
+
+        const chatMessages = document.getElementById('chatMessages');
+        const chatForm = document.getElementById('chatForm');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // Helper to append messages to the DOM
+        function appendMessage(text, sender) {
+            const messageEl = document.createElement('div');
+            messageEl.classList.add('message', sender);
+            messageEl.textContent = text;
+            chatMessages.appendChild(messageEl);
+            scrollToBottom();
+        }
+
+        // Helper to show/hide typing indicator
+        function toggleTypingIndicator(show) {
+            const existingIndicator = document.getElementById('typingIndicator');
+            if (show && !existingIndicator) {
+                const indicator = document.createElement('div');
+                indicator.id = 'typingIndicator';
+                indicator.classList.add('typing-indicator');
+                indicator.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+                chatMessages.appendChild(indicator);
+                scrollToBottom();
+            } else if (!show && existingIndicator) {
+                existingIndicator.remove();
+            }
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Main Submit Event
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const messageText = userInput.value.trim();
+            if (!messageText) return;
+
+            // Display user's message immediately
+            appendMessage(messageText, 'user');
+            userInput.value = '';
+            
+            // Disable UI while waiting
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+            toggleTypingIndicator(true);
+
+            try {
+                // Send the payload to your n8n webhook
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: messageText,
+                        sessionId: sessionId
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not OK');
+                }
+
+                // Parse the response from n8n
+                const data = await response.json();
+                
+                toggleTypingIndicator(false);
+
+                // Handle reading the text output dynamically based on standard n8n return structures
+                let botReply = "I'm sorry, I couldn't process that response.";
+                
+                if (typeof data === 'string') {
+                    botReply = data;
+                } else if (data.output || data.response || data.text || data.message) {
+                    botReply = data.output || data.response || data.text || data.message;
+                } else if (Array.isArray(data) && data[0]?.output) {
+                    botReply = data[0].output;
+                } else {
+                    // Fallback to pretty-printing the object if it's an unrecognized JSON shape
+                    botReply = JSON.stringify(data);
+                }
+
+                appendMessage(botReply, 'bot');
+
+            } catch (error) {
+                console.error('Error communicating with webhook:', error);
+                toggleTypingIndicator(false);
+                appendMessage("Sorry, I'm having trouble connecting right now. Please try again.", 'bot');
+            } finally {
+                // Re-enable UI elements
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
