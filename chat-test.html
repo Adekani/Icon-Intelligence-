@@ -298,7 +298,7 @@
             } catch (error) {
                 console.error('Error communicating with webhook:', error);
                 toggleTypingIndicator(false);
-                appendMessage("DEBUG ERROR -> name: " + error.name + " | message: " + error.message, 'bot');
+                appendMessage("Sorry, I'm having trouble connecting right now. Please try again.", 'bot');
             } finally {
                 // Re-enable UI elements
                 userInput.disabled = false;
