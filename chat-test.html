@@ -284,8 +284,8 @@
                 
                 if (typeof data === 'string') {
                     botReply = data;
-                } else if (data.output || data.response || data.text || data.message) {
-                    botReply = data.output || data.response || data.text || data.message;
+                } else if (data.reply || data.output || data.response || data.text || data.message) {
+                    botReply = data.reply || data.output || data.response || data.text || data.message;
                 } else if (Array.isArray(data) && data[0]?.output) {
                     botReply = data[0].output;
                 } else {
