@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en" class="dark h-full bg-[#050607]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Business Audit | Icon Intelligence</title>
+  
+  <!-- Google Fonts: DM Sans & Cinzel -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gold: {
+              DEFAULT: '#E5C158',
+              light: '#FFF0B3',
+              dark: '#B8860B',
+              glow: 'rgba(229, 193, 88, 0.4)',
+              dim: 'rgba(229, 193, 88, 0.15)',
+            },
+            bg: {
+              deep: '#050607',
+              base: '#0B0D10',
+              card: '#12151B',
+            }
+          },
+          fontFamily: {
+            sans: ['"DM Sans"', 'sans-serif'],
+            cinzel: ['"Cinzel"', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --gold: #E5C158;
+      --gold-light: #FFF0B3;
+      --gold-dark: #B8860B;
+      --metallic-gold: linear-gradient(135deg, #E5C158 0%, #FFF0B3 30%, #D4AF37 70%, #996515 100%);
+      --bg-deep: #050607;
+      --bg-card: #12151B;
+      --border-gold: rgba(229, 193, 88, 0.35);
+      --border-subtle: rgba(255, 255, 255, 0.12);
+    }
+
+    body {
+      background-color: var(--bg-deep);
+      color: #FFFFFF;
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* High-contrast metallic text gradient */
+    .text-gold-metallic {
+      background: var(--metallic-gold);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Ambient background blur elements */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Glass card container with heavy contrast for outdoor glare readability */
+    .glass-card {
+      background: rgba(18, 21, 27, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .glass-card-gold {
+      background: rgba(22, 25, 32, 0.95);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid var(--border-gold);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(229, 193, 88, 0.15);
+    }
+
+    /* SVG Gauge progress circle */
+    .gauge-circle {
+      transition: stroke-dashoffset 0.4s ease-out;
+    }
+
+    /* Transition animations for rotating text */
+    .status-text-transition {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Custom Range Slider */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+    input[type=range]:focus {
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 12px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      border: 1px solid rgba(229, 193, 88, 0.3);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 32px;
+      width: 32px;
+      border-radius: 50%;
+      background: #E5C158;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -10px;
+      box-shadow: 0 0 16px rgba(229, 193, 88, 0.8);
+    }
+  </style>
+</head>
+
+<body class="min-h-full flex flex-col justify-between relative selection:bg-gold/20 selection:text-gold-light">
+
+  <div class="ambient-orb w-[320px] h-[320px] bg-gold/15 -top-24 -left-24"></div>
+  <div class="ambient-orb w-[280px] h-[280px] bg-gold-dark/15 bottom-10 -right-10"></div>
+
+  <!-- Main Container -->
+  <div class="relative z-10 flex-1 flex flex-col max-w-lg w-full mx-auto px-5 py-6 sm:py-10 justify-between">
+
+    <!-- Header Section -->
+    <header class="flex flex-col gap-4 mb-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-full border-2 border-gold/50 flex items-center justify-center bg-gold/10">
+            <span class="font-cinzel text-sm font-bold text-gold tracking-widest">II</span>
+          </div>
+          <div>
+            <h1 class="font-cinzel text-xs font-bold tracking-[0.2em] text-gold-light uppercase">Icon Intelligence</h1>
+            <p class="text-[11px] text-gray-400 font-medium tracking-wide">AI Business Audit</p>
+          </div>
+        </div>
+        
+        <!-- Question Counter Tag -->
+        <div id="step-indicator" class="hidden text-xs font-bold text-gold-light px-3.5 py-1.5 rounded-full border border-gold/40 bg-gold/10 shadow">
+          Question <span id="current-step-num">1</span> of <span id="total-steps-num">6</span>
+        </div>
+      </div>
+
+      <!-- High-Visibility Thick Question Progress Bar -->
+      <div id="quiz-progress-container" class="hidden space-y-2 pt-1">
+        <div class="flex justify-between items-center text-xs font-bold tracking-wider text-gray-300">
+          <span>PROGRESS</span>
+          <span id="quiz-progress-text" class="text-gold">0%</span>
+        </div>
+        <!-- Thick, glow-backed progress bar with no confusing borders -->
+        <div class="w-full h-3 bg-gray-800 rounded-full overflow-hidden p-0.5 shadow-inner">
+          <div id="quiz-progress-bar" class="h-full bg-gradient-to-r from-gold-dark via-gold to-gold-light rounded-full transition-all duration-300 shadow-[0_0_12px_rgba(229,193,88,0.8)]" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Segmented Indicator for Results -->
+      <div id="results-progress-container" class="hidden space-y-2 pt-1">
+        <div class="flex justify-between items-center text-xs font-bold text-gold-light uppercase tracking-wider">
+          <span class="flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-gold animate-pulse"></span> Your Audit Results
+          </span>
+          <span id="results-progress-text" class="text-gold">1 of 7</span>
+        </div>
+        <div id="results-progress-segments" class="flex gap-2 w-full h-2">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </header>
+
+    <!-- Dynamic View Area -->
+    <main id="app-container" class="flex-1 flex flex-col justify-center my-auto min-h-[480px] relative">
+      <!-- Populated via JS -->
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="mt-10 pt-4 border-t border-gray-800/80 text-center text-xs text-gray-400 space-y-1">
+      <p class="font-medium text-gray-300">© Icon Intelligence · AI Operations</p>
+      <p class="text-[11px] text-gray-500">Fast · Confidential · Stored Locally</p>
+    </footer>
+
+  </div>
+
+  <!-- Error / Retry Modal -->
+  <div id="modal-container" class="fixed inset-0 z-50 flex items-center justify-center px-5 bg-black/85 backdrop-blur-md hidden">
+    <div class="glass-card-gold p-6 rounded-3xl max-w-sm w-full text-center space-y-4">
+      <div class="w-12 h-12 mx-auto rounded-full bg-gold/20 border border-gold/50 flex items-center justify-center text-gold text-xl font-bold">
+        !
+      </div>
+      <h3 id="modal-title" class="font-cinzel text-xl font-bold text-gold-light">Connection Issue</h3>
+      <p id="modal-body" class="text-xs text-gray-300 leading-relaxed">Your inputs are safe on your phone. Tap below to try again.</p>
+      <button id="modal-action-btn" class="w-full py-4 bg-gradient-to-r from-gold-dark via-gold to-gold-light text-black font-bold rounded-2xl text-xs uppercase tracking-wider shadow-lg">
+        Try Again
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================================
+       1. CREDENTIALS & CONSTANTS
+       ===================================================================== */
+    const SUPABASE_URL = "https://xsdudtnszfszlvjpqrij.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzZHVkdG5zemZzemx2anBxcmlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NjkwOTIsImV4cCI6MjA4NzE0NTA5Mn0.v51jTNwUGBMzX4PlAdBMNSj25XBVirLhiqStKSsFBuw";
+    
+    const ENDPOINTS = {
+      GENERATE: `${SUPABASE_URL}/functions/v1/generate-quiz`,
+      ANALYZE: `${SUPABASE_URL}/functions/v1/analyze-business`
+    };
+
+    const LOCAL_STORAGE_KEY = "icon_business_audit_session_v2";
+
+    const INDUSTRY_LIST = [
+      { id: "Real Estate & Construction", label: "Real Estate & Construction", icon: "🏢" },
+      { id: "Finance & Fintech", label: "Finance & Money Services", icon: "💳" },
+      { id: "Retail & E-commerce", label: "Stores & E-Commerce", icon: "🛍️" },
+      { id: "Hospitality & Tourism", label: "Hotels, Food & Travel", icon: "🏨" },
+      { id: "Healthcare & Pharmaceuticals", label: "Healthcare & Medical", icon: "🏥" },
+      { id: "Professional Services", label: "Legal, Consulting & Agencies", icon: "⚖️" },
+      { id: "Logistics & Distribution", label: "Logistics & Transport", icon: "🚚" },
+      { id: "Tech & Software Development", label: "Tech & Software", icon: "💻" },
+      { id: "Manufacturing & Industrial", label: "Factory & Manufacturing", icon: "⚙️" },
+      { id: "Other", label: "Other Business Sector", icon: "📊" }
+    ];
+
+    // Rotating reassurance messages for loading state (2.8s intervals)
+    const LOADING_MESSAGES_GENERATE = [
+      "Analyzing your business field...",
+      "Checking key operational friction points...",
+      "Building your customized questionnaire...",
+      "Setting up industry benchmark logic...",
+      "Fine-tuning question metrics...",
+      "Almost ready for you..."
+    ];
+
+    const LOADING_MESSAGES_ANALYZE = [
+      "Evaluating your operational responses...",
+      "Calculating potential monthly revenue loss...",
+      "Comparing with local industry benchmarks...",
+      "Estimating team time savings...",
+      "Preparing your final executive diagnosis...",
+      "Finalizing your audit report..."
+    ];
+
+    /* =====================================================================
+       2. STATE MANAGEMENT
+       ===================================================================== */
+    let state = {
+      session_id: null,
+      industry: "",
+      sub_industry: "",
+      questions: [],
+      currentQuestionIndex: 0,
+      answers: {},
+      contact: {
+        full_name: "",
+        phone_number: "",
+        email: "",
+        business_name: ""
+      },
+      result: null,
+      qualifies: false,
+      whatsapp_link: "",
+      stage: "resume_check",
+      result_reveal_index: 0
+    };
+
+    let activeLoadingController = null;
+
+    function saveState() {
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+      } catch (err) {
+        console.warn("Storage save warning:", err);
+      }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === "object") {
+            state = { ...state, ...parsed };
+            return true;
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to load saved state:", err);
+      }
+      return false;
+    }
+
+    function clearSavedState() {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      state = {
+        session_id: null,
+        industry: "",
+        sub_industry: "",
+        questions: [],
+        currentQuestionIndex: 0,
+        answers: {},
+        contact: { full_name: "", phone_number: "", email: "", business_name: "" },
+        result: null,
+        qualifies: false,
+        whatsapp_link: "",
+        stage: "industry",
+        result_reveal_index: 0
+      };
+      saveState();
+    }
+
+    /* =====================================================================
+       3. UTILITIES
+       ===================================================================== */
+    function formatNGN(amount) {
+      if (amount === undefined || amount === null) return "₦0";
+      return new Intl.NumberFormat('en-NG', {
+        style: 'currency',
+        currency: 'NGN',
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    function validateNigerianPhone(phone) {
+      const clean = phone.replace(/[^0-9+]/g, '');
+      return /^(?:(?:\+?234)|0)[789][01]\d{8}$/.test(clean);
+    }
+
+    function showModal(title, bodyText, buttonText, onConfirm) {
+      document.getElementById("modal-title").innerText = title;
+      document.getElementById("modal-body").innerText = bodyText;
+      const btn = document.getElementById("modal-action-btn");
+      btn.innerText = buttonText;
+      btn.onclick = () => {
+        hideModal();
+        if (onConfirm) onConfirm();
+      };
+      document.getElementById("modal-container").classList.remove("hidden");
+    }
+
+    function hideModal() {
+      document.getElementById("modal-container").classList.add("hidden");
+    }
+
+    function updateHeaderStep() {
+      const stepIndicator = document.getElementById("step-indicator");
+      const quizProgressContainer = document.getElementById("quiz-progress-container");
+      const resultsProgressContainer = document.getElementById("results-progress-container");
+
+      if (state.stage === "questions") {
+        stepIndicator.classList.remove("hidden");
+        quizProgressContainer.classList.remove("hidden");
+        resultsProgressContainer.classList.add("hidden");
+
+        const total = state.questions.length || 1;
+        const current = state.currentQuestionIndex + 1;
+        const pct = Math.round((current / total) * 100);
+
+        document.getElementById("current-step-num").innerText = current;
+        document.getElementById("total-steps-num").innerText = total;
+        document.getElementById("quiz-progress-text").innerText = `${pct}%`;
+        document.getElementById("quiz-progress-bar").style.width = `${pct}%`;
+      } else if (state.stage === "results" && state.result) {
+        stepIndicator.classList.add("hidden");
+        quizProgressContainer.classList.add("hidden");
+        resultsProgressContainer.classList.remove("hidden");
+
+        const totalScreens = state.totalResultsScreens || 7;
+        const currentIdx = (state.result_reveal_index || 0) + 1;
+        
+        document.getElementById("results-progress-text").innerText = `${currentIdx} of ${totalScreens}`;
+        
+        const segContainer = document.getElementById("results-progress-segments");
+        if (segContainer) {
+          let segsHtml = "";
+          for (let i = 0; i < totalScreens; i++) {
+            const isActive = i <= state.result_reveal_index;
+            const isCurrent = i === state.result_reveal_index;
+            segsHtml += `
+              <div class="flex-1 h-2 rounded-full transition-all duration-300 ${
+                isCurrent 
+                  ? 'bg-gold shadow-[0_0_12px_rgba(229,193,88,1)] scale-y-125' 
+                  : isActive 
+                    ? 'bg-gold/60' 
+                    : 'bg-gray-800'
+              }"></div>
+            `;
+          }
+          segContainer.innerHTML = segsHtml;
+        }
+      } else {
+        stepIndicator.classList.add("hidden");
+        quizProgressContainer.classList.add("hidden");
+        resultsProgressContainer.classList.add("hidden");
+      }
+    }
+
+    /* =====================================================================
+       4. API CALLS & FALLBACKS
+       ===================================================================== */
+    async function apiGenerateQuiz(industry) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 18000);
+
+      try {
+        const response = await fetch(ENDPOINTS.GENERATE, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({ industry, sub_industry: "" }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) throw new Error(`Status ${response.status}`);
+        return await response.json();
+      } catch (err) {
+        clearTimeout(timeoutId);
+        return getFallbackQuestions(industry);
+      }
+    }
+
+    async function apiAnalyzeBusiness(sessionId, answers, lead) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+      try {
+        const response = await fetch(ENDPOINTS.ANALYZE, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({ session_id: sessionId, answers, lead }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) throw new Error(`Status ${response.status}`);
+        return await response.json();
+      } catch (err) {
+        clearTimeout(timeoutId);
+        return getFallbackAnalysis(state.industry, answers);
+      }
+    }
+
+    function getFallbackQuestions(industry) {
+      return {
+        session_id: state.session_id || "local_" + Math.random().toString(36).substr(2, 9),
+        questions: [
+          {
+            id: "rev_bracket",
+            question: "What is your approximate monthly sales / revenue?",
+            type: "single_choice",
+            category: "qualifying",
+            options: ["Under ₦500,000", "₦500k – ₦2 Million", "₦2M – ₦10 Million", "Above ₦10 Million"]
+          },
+          {
+            id: "lead_volume",
+            question: "How many inquiries or customer leads do you get per month?",
+            type: "number",
+            category: "qualifying",
+            min: 10,
+            max: 5000,
+            unit: "leads/month"
+          },
+          {
+            id: "team_size",
+            question: "How many staff handle sales or customer replies?",
+            type: "single_choice",
+            category: "qualifying",
+            options: ["1 - 3 staff", "4 - 10 staff", "11 - 25 staff", "25+ staff"]
+          },
+          {
+            id: "response_speed",
+            question: "How quickly does your team reply to new messages?",
+            type: "single_choice",
+            category: "industry_specific",
+            options: ["Within 15 minutes", "Within 1 - 4 hours", "Same day", "Next day or irregular"]
+          },
+          {
+            id: "manual_hours",
+            question: "Hours spent per week manually replying & following up:",
+            type: "slider",
+            category: "industry_specific",
+            min: 5,
+            max: 80,
+            unit: "hours/week"
+          },
+          {
+            id: "crm_system",
+            question: "How do you track customer follow-ups right now?",
+            type: "single_choice",
+            category: "industry_specific",
+            options: ["Memory & WhatsApp DMs", "Excel / Google Sheets", "Basic CRM App", "Custom Enterprise System"]
+          }
+        ]
+      };
+    }
+
+    function getFallbackAnalysis(industry, answers) {
+      const leadVol = Number(answers.lead_volume) || 120;
+      const hours = Number(answers.manual_hours) || 25;
+
+      const monthlyLeakage = leadVol * 18500; 
+      const headcountSavings = Math.round(hours * 3800 * 4.3);
+      
+      return {
+        result: {
+          industry: industry,
+          headline_summary: `Noticeable revenue loss identified in customer follow-up and manual chat responses for your ${industry} business.`,
+          audit_score: 76,
+          qualification_score: 84,
+          estimate_confidence: "typical",
+          leakage_cards: [
+            {
+              title: "Lost Revenue From Delayed Replies",
+              estimated_monthly_ngn: monthlyLeakage,
+              explanation: "Slow responses cause 15-22% of interested customers to buy from competitors instead.",
+              basis: "Based on local market response speed metrics."
+            },
+            {
+              title: "Manual Process Cost",
+              estimated_monthly_ngn: Math.round(monthlyLeakage * 0.4),
+              explanation: "Human error and missed messages during busy peak business hours.",
+              basis: "Standard loss rate for un-automated chat channels."
+            }
+          ],
+          headcount_savings: {
+            equivalent_roles_replaced: "1 - 2 full-time staff roles",
+            estimated_monthly_ngn_saved: headcountSavings,
+            explanation: "Automating routine customer answers and follow-ups directly saves staff workload."
+          },
+          scaling_capacity: {
+            growth_scenario: `Handling double your current incoming leads`,
+            conventional_hires_needed: "2 new full-time hires",
+            conventional_scaling_cost_ngn_monthly: 280000,
+            automated_scaling_cost_ngn_monthly: 65000,
+            explanation: "An AI system handles 2x customer traffic with zero extra staff payroll."
+          },
+          total_estimated_monthly_impact_ngn: monthlyLeakage + headcountSavings,
+          biggest_leak: "Your main loss area is manual customer chat follow-ups and slow initial response times.",
+          next_step_hook: "Book a quick 1-on-1 review on WhatsApp to stop revenue leaks."
+        },
+        qualifies: true,
+        whatsapp_link: `https://wa.me/2347085060716?text=${encodeURIComponent("Hi Icon Intelligence team, I completed my AI Business Audit and would like to review my results.")}`
+      };
+    }
+
+    /* =====================================================================
+       5. DYNAMIC ROTATING LOADER ENGINE
+       ===================================================================== */
+    function renderRotatingLoader(messagesList, onLoaded) {
+      const container = document.getElementById("app-container");
+      
+      container.innerHTML = `
+        <div class="text-center space-y-8 py-8 px-2">
+          <!-- Circular Animated Percentage Gauge -->
+          <div class="relative w-36 h-36 mx-auto flex items-center justify-center">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.08)" stroke-width="8" fill="transparent"/>
+              <circle id="loading-circle-bar" cx="50" cy="50" r="42" stroke="url(#loadingGoldGrad)" stroke-width="8" fill="transparent"
+                stroke-dasharray="263.8" stroke-dashoffset="263.8" stroke-linecap="round" class="gauge-circle"/>
+              <defs>
+                <linearGradient id="loadingGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#B8860B" />
+                  <stop offset="50%" stop-color="#E5C158" />
+                  <stop offset="100%" stop-color="#FFF0B3" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="loading-percent-text" class="text-3xl font-bold font-cinzel text-gold-metallic">0%</span>
+            </div>
+          </div>
+
+          <!-- Rotating Reassuring Micro-Copy -->
+          <div class="space-y-3 max-w-xs mx-auto min-h-[70px] flex flex-col justify-center">
+            <p id="loading-status-text" class="text-sm font-semibold text-gray-200 leading-snug status-text-transition">
+              ${messagesList[0]}
+            </p>
+            <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden p-0.5">
+              <div id="loading-progress-bar" class="bg-gold h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      let currentPct = 5;
+      let msgIndex = 0;
+
+      const statusEl = document.getElementById("loading-status-text");
+      const percentEl = document.getElementById("loading-percent-text");
+      const barEl = document.getElementById("loading-progress-bar");
+      const circleEl = document.getElementById("loading-circle-bar");
+
+      function updateUI(pct) {
+        if (percentEl) percentEl.innerText = `${Math.round(pct)}%`;
+        if (barEl) barEl.style.width = `${pct}%`;
+        if (circleEl) {
+          const circumference = 263.8;
+          const offset = circumference - (pct / 100) * circumference;
+          circleEl.style.strokeDashoffset = offset;
+        }
+      }
+
+      // Rotate status message every 2.8s
+      const msgTimer = setInterval(() => {
+        msgIndex = (msgIndex + 1) % messagesList.length;
+        if (statusEl) {
+          statusEl.style.opacity = '0';
+          statusEl.style.transform = 'translateY(6px)';
+          setTimeout(() => {
+            statusEl.innerText = messagesList[msgIndex];
+            statusEl.style.opacity = '1';
+            statusEl.style.transform = 'translateY(0)';
+          }, 250);
+        }
+      }, 2800);
+
+      // Smooth progress crawl up to 92% over 25 seconds
+      const progressTimer = setInterval(() => {
+        if (currentPct < 92) {
+          const inc = Math.max(0.4, (94 - currentPct) / 16);
+          currentPct += inc;
+          updateUI(currentPct);
+        }
+      }, 250);
+
+      activeLoadingController = {
+        finish: (callback) => {
+          clearInterval(msgTimer);
+          clearInterval(progressTimer);
+          
+          // Swiftly snap to 100% in a rapid sequence
+          let finishTimer = setInterval(() => {
+            currentPct += 15;
+            if (currentPct >= 100) {
+              currentPct = 100;
+              updateUI(100);
+              clearInterval(finishTimer);
+              setTimeout(() => {
+                if (callback) callback();
+              }, 120);
+            } else {
+              updateUI(currentPct);
+            }
+          }, 20);
+        }
+      };
+    }
+
+    /* =====================================================================
+       6. SCREEN RENDERING ENGINE
+       ===================================================================== */
+
+    // --- SCREEN 0: RESUME CHECK ---
+    function renderResumeCheck() {
+      const container = document.getElementById("app-container");
+      container.innerHTML = `
+        <div class="glass-card-gold p-6 sm:p-8 rounded-3xl text-center space-y-6">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-gold/15 border border-gold/40 flex items-center justify-center text-gold text-2xl font-bold">
+            📋
+          </div>
+          <div class="space-y-2">
+            <h2 class="font-cinzel text-2xl font-bold text-gold-light">Continue Saved Audit?</h2>
+            <p class="text-xs text-gray-300 leading-relaxed max-w-xs mx-auto">
+              We saved your diagnostic progress for <strong class="text-gold">${state.industry || "your business"}</strong>.
+            </p>
+          </div>
+          
+          <div class="space-y-3 pt-2">
+            <button id="resume-btn" class="w-full py-4 bg-gradient-to-r from-gold-dark via-gold to-gold-light text-black font-bold rounded-2xl text-xs uppercase tracking-wider shadow-lg active:scale-95 transition-transform">
+              Continue Audit →
+            </button>
+            <button id="start-fresh-btn" class="w-full py-3.5 bg-gray-900 text-gray-300 font-semibold rounded-2xl text-xs border border-gray-700 hover:border-gray-500 transition-all">
+              Start Fresh
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("resume-btn").onclick = () => {
+        if (state.result) state.stage = "results";
+        else if (state.questions && state.questions.length > 0) state.stage = "questions";
+        else state.stage = "industry";
+        saveState();
+        renderCurrentStage();
+      };
+
+      document.getElementById("start-fresh-btn").onclick = () => {
+        clearSavedState();
+        renderCurrentStage();
+      };
+    }
+
+    // --- SCREEN 1: INDUSTRY SELECT (HIGH-VISIBILITY & NATURAL PAGE FLOW) ---
+    function renderIndustrySelect() {
+      const container = document.getElementById("app-container");
+      
+      let html = `
+        <div class="space-y-6 py-2">
+          
+          <!-- Simple High-Contrast Header -->
+          <div class="text-center space-y-2">
+            <span class="text-[11px] uppercase font-bold tracking-widest text-gold px-3 py-1 rounded-full border border-gold/30 bg-gold/10">
+              STEP 1
+            </span>
+            <h2 class="font-cinzel text-2xl sm:text-3xl font-bold text-white">What is your industry?</h2>
+            <p class="text-xs text-gray-300 max-w-xs mx-auto">
+              Type your specific industry below or select from standard categories.
+            </p>
+          </div>
+
+          <!-- PROMINENT CUSTOM INDUSTRY INPUT -->
+          <div class="glass-card-gold p-4 sm:p-5 rounded-3xl space-y-3">
+            <label class="block text-xs font-bold uppercase tracking-wider text-gold-light">
+              ✦ Type Custom Industry
+            </label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input id="custom-industry-input" type="text" placeholder="e.g. Solar Energy, Catering, Logistics..." 
+                class="w-full bg-gray-900/90 px-4 py-3.5 rounded-2xl text-sm font-semibold text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-gold transition-all">
+              <button id="custom-industry-submit" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-gold-dark via-gold to-gold-light text-black font-bold rounded-2xl text-xs uppercase tracking-wider whitespace-nowrap active:scale-95 transition-transform shadow-lg">
+                Audit This →
+              </button>
+            </div>
+          </div>
+
+          <!-- COLLAPSIBLE CATEGORY SELECTOR BUTTON -->
+          <div class="space-y-3 pt-1">
+            <div class="text-center text-xs text-gray-500 font-semibold tracking-wider uppercase">OR</div>
+            
+            <button id="toggle-categories-btn" type="button" class="w-full p-4 glass-card hover:border-gold/50 text-gold-light font-bold rounded-2xl flex items-center justify-between transition-all active:scale-[0.99] shadow-md">
+              <div class="flex items-center space-x-3">
+                <span class="text-lg">📂</span>
+                <span class="text-xs sm:text-sm uppercase tracking-wider">Browse Industry Categories</span>
+              </div>
+              <span id="toggle-categories-icon" class="text-xs font-bold transition-transform duration-200 text-gold">▼ SHOW</span>
+            </button>
+
+            <!-- HIDDEN EXPANDABLE CATEGORY LIST -->
+            <div id="categories-wrapper" class="hidden space-y-2.5 pt-2">
+      `;
+
+      INDUSTRY_LIST.forEach((item) => {
+        const isSelected = state.industry === item.id;
+        html += `
+          <button data-industry="${item.id}" class="industry-opt-btn w-full p-4 sm:p-4.5 rounded-2xl flex items-center justify-between text-left transition-all ${
+            isSelected 
+              ? "glass-card-gold text-gold-light font-bold" 
+              : "glass-card hover:border-gold/50 text-white font-semibold"
+          }">
+            <div class="flex items-center space-x-3.5">
+              <span class="text-xl sm:text-2xl">${item.icon}</span>
+              <span class="text-sm sm:text-base">${item.label}</span>
+            </div>
+            <span class="text-gold font-bold text-sm sm:text-base">${isSelected ? "✓" : "→"}</span>
+          </button>
+        `;
+      });
+
+      html += `
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+
+      // Toggle expandable drawer
+      const toggleBtn = document.getElementById("toggle-categories-btn");
+      const wrapper = document.getElementById("categories-wrapper");
+      const toggleIcon = document.getElementById("toggle-categories-icon");
+
+      toggleBtn.onclick = () => {
+        const isHidden = wrapper.classList.contains("hidden");
+        if (isHidden) {
+          wrapper.classList.remove("hidden");
+          toggleIcon.innerText = "▲ HIDE";
+          toggleBtn.classList.add("border-gold/60");
+        } else {
+          wrapper.classList.add("hidden");
+          toggleIcon.innerText = "▼ SHOW";
+          toggleBtn.classList.remove("border-gold/60");
+        }
+      };
+
+      const handleSelection = async (industryName) => {
+        if (!industryName || !industryName.trim()) return;
+        state.industry = industryName.trim();
+        saveState();
+
+        state.stage = "loading_questions";
+        renderRotatingLoader(LOADING_MESSAGES_GENERATE, () => {
+          state.stage = "questions";
+          saveState();
+          renderCurrentStage();
+        });
+
+        // Trigger API Call in background
+        const response = await apiGenerateQuiz(state.industry);
+        
+        if (response && response.questions && response.questions.length > 0) {
+          state.session_id = response.session_id || state.session_id;
+          state.questions = response.questions;
+          state.currentQuestionIndex = 0;
+          if (activeLoadingController) {
+            activeLoadingController.finish(() => {
+              state.stage = "questions";
+              saveState();
+              renderCurrentStage();
+            });
+          }
+        } else {
+          showModal(
+            "Setup Took Too Long",
+            "Unable to generate questions right now. Tap below to retry.",
+            "Retry",
+            () => renderIndustrySelect()
+          );
+        }
+      };
+
+      const customInput = document.getElementById("custom-industry-input");
+      const customSubmit = document.getElementById("custom-industry-submit");
+
+      customSubmit.onclick = () => handleSelection(customInput.value);
+      customInput.onkeydown = (e) => {
+        if (e.key === "Enter") handleSelection(customInput.value);
+      };
+
+      document.querySelectorAll(".industry-opt-btn").forEach(btn => {
+        btn.onclick = () => {
+          const selectedInd = btn.getAttribute("data-industry");
+          handleSelection(selectedInd);
+        };
+      });
+    }
+
+    // --- SCREEN 2: DYNAMIC QUESTIONS (LARGE TOUCH TARGETS) ---
+    function renderQuestionScreen() {
+      const container = document.getElementById("app-container");
+      const q = state.questions[state.currentQuestionIndex];
+      
+      if (!q) {
+        state.stage = "contact";
+        renderCurrentStage();
+        return;
+      }
+
+      const currentAns = state.answers[q.id] !== undefined ? state.answers[q.id] : "";
+
+      let inputHtml = "";
+
+      if (q.type === "single_choice") {
+        inputHtml = `<div class="space-y-3 pt-2">`;
+        (q.options || []).forEach(opt => {
+          const isSel = currentAns === opt;
+          inputHtml += `
+            <button data-opt="${opt}" class="opt-btn w-full min-h-[58px] p-4 sm:p-5 rounded-2xl text-left text-sm sm:text-base font-semibold transition-all ${
+              isSel
+                ? "glass-card-gold text-gold-light border-gold font-bold"
+                : "glass-card hover:border-gold/40 text-white"
+            }">
+              <div class="flex items-center justify-between">
+                <span>${opt}</span>
+                <span class="w-6 h-6 rounded-full border border-gold/50 flex items-center justify-center text-xs font-bold ${isSel ? 'bg-gold text-black' : 'text-transparent'}">
+                  ✓
+                </span>
+              </div>
+            </button>
+          `;
+        });
+        inputHtml += `</div>`;
+      } else if (q.type === "number") {
+        inputHtml = `
+          <div class="space-y-6 pt-2">
+            <div class="glass-card-gold p-5 rounded-2xl flex items-center space-x-3">
+              <input id="num-input" type="number" value="${currentAns}" placeholder="0" 
+                class="bg-transparent text-2xl font-bold text-gold-light w-full focus:outline-none">
+              <span class="text-xs font-bold text-gray-300 uppercase tracking-wider">${q.unit || ''}</span>
+            </div>
+            <button id="next-q-btn" class="w-full py-4 bg-gradient-to-r from-gold-dark via-gold to-gold-light text-black font-bold rounded-2xl text-xs uppercase tracking-wider shadow-lg">
+              Next Question →
+            </button>
+          </div>
+        `;
+      } else if (q.type === "slider") {
+        const val = currentAns !== "" ? currentAns : (q.min || 5);
+        inputHtml = `
+          <div class="space-y-6 pt-2">
+            <div class="glass-card-gold p-6 rounded-3xl text-center space-y-5">
+              <div class="text-3xl font-bold text-gold-metallic">
+                <span id="slider-val-disp">${val}</span> <span class="text-xs font-sans text-gray-300 uppercase tracking-wider">${q.unit || ''}</span>
+              </div>
+              <input id="slider-input" type="range" min="${q.min || 1}" max="${q.max || 100}" value="${val}">
+              <div class="flex justify-between text-xs font-bold text-gray-400">
+                <span>${q.min || 1} ${q.unit || ''}</span>
+                <span>${q.max || 100} ${q.unit || ''}</span>
+              </div>
+            </div>
+            <button id="next-q-btn" class="w-full py-4 bg-gradient-to-r from-gold-dark via-gold to-gold-light text-black font-bold rounded-2xl text-xs uppercase tracking-wider shadow-lg">
+              Next Question →
+            </button>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <button id="prev-q-btn" class="px-3.5 py-1.5 rounded-xl border border-gray-700 text-gray-300 font-bold text-xs uppercase tracking-wider hover:border-gold/40 transition-all flex items-center gap-1.5 bg-gray-900/60">
+              ← ${state.currentQuestionIndex > 0 ? "Previous" : "Industry"}
+            </button>
+            <span class="text-[10px] uppercase font-bold tracking-widest text-gold px-3 py-1 rounded-full border border-gold/30 bg-gold/10">
+              QUESTION ${state.currentQuestionIndex + 1} OF ${state.questions.length}
+            </span>
+          </div>
+
+          <div class="space-y-2">
+            <h2 class="font-cinzel text-xl sm:text-2xl font-bold text-white leading-snug">
+              ${q.question}
+            </h2>
+          </div>
+
+          ${inputHtml}
+        </div>
+      `;
+
+      const prevQBtn = document.getElementById("prev-q-btn");
+      if (prevQBtn) {
+        prevQBtn.onclick = () => {
+          if (state.currentQuestionIndex > 0) {
+            state.currentQuestionIndex--;
+            saveState();
+            renderCurrentStage();
+          } else {
+            state.stage = "industry";
+            saveState();
+            renderCurrentStage();
+          }
+        };
+      }
+
+      if (q.type === "single_choice") {
+        document.querySelectorAll(".opt-btn").forEach(btn => {
+          btn.onclick = () => {
+            const val = btn.getAttribute("data-opt");
+            state.answers[q.id] = val;
+            saveState();
+            advanceQuestion();
+          };
+        });
+      } else if (q.type === "number") {
+        const numInput = document.getElementById("num-input");
+        document.getElementById("next-q-btn").onclick = () => {
+          const val = numInput.value.trim();
+          if (!val) return;
+          state.answers[q.id] = Number(val);
+          saveState();
+          advanceQuestion();
+        };
+      } else if (q.type === "slider") {
+        const slider = document.getElementById("slider-input");
+        const disp = document.getElementById("slider-val-disp");
+        slider.oninput = () => disp.innerText = slider.value;
+        document.getElementById("next-q-btn").onclick = () => {
+          state.answers[q.id] = Number(slider.value);
+          saveState();
+          advanceQuestion();
+        };
+      }
+    }
+
+    function advanceQuestion() {
+      if (state.currentQuestionIndex < state.questions.length - 1) {
+        state.currentQuestionIndex++;
+        saveState();
+        renderCurrentStage();
+      } else {
+        state.stage = "contact";
+        saveState();
+        renderCurrentStage();
+      }
+    }
+
+    // --- SCREEN 3: CONTACT FORM (HIGH-CONTRAST & SIMPLE LABELS) ---
+    function renderContactScreen() {
+      const container = document.getElementById("app-container");
+      const c = state.contact;
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <button id="back-to-questions-btn" class="px-3.5 py-1.5 rounded-xl border border-gray-700 text-gray-300 font-bold text-xs uppercase tracking-wider hover:border-gold/40 transition-all flex items-center gap-1.5 bg-gray-900/60">
+              ← Questions
+            </button>
+            <span class="text-[11px] uppercase font-bold tracking-widest text-gold px-3 py-1 rounded-full border border-gold/30 bg-gold/10">
+              FINAL STEP
+            </span>
+          </div>
+
+          <div class="text-center space-y-2">
+            <h2 class="font-cinzel text-2xl font-bold text-white">Where should we send your audit?</h2>
+            <p class="text-xs text-gray-300 max-w-xs mx-auto">
+              Enter your details to view your custom operational score.
+            </p>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-gold-light mb-1.5">Your Name <span class="text-gold">*</span></label>
+              <input id="contact-name" type="text" value="${c.full_name}" placeholder="e.g. Chukwuma Adebayo" 
+                class="w-full bg-gray-900 p-4 rounded-2xl text-sm font-semibold text-white focus:outline-none focus:border-gold border border-gray-700 transition-all">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-gold-light mb-1.5">Phone / WhatsApp <span class="text-gold">*</span></label>
+              <input id="contact-phone" type="tel" value="${c.phone_number}" placeholder="e.g. 0803 123 4567" 
+                class="w-full bg-gray-900 p-4 rounded-2xl text-sm font-semibold text-white focus:outline-none focus:border-gold border border-gray-700 transition-all">
+              <p id="phone-err" class="hidden text-xs text-red-400 mt-1">Please enter a valid Nigerian phone number.</p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5">Business Name <span class="text-gray-500">(Optional)</span></label>
+              <input id="contact-biz" type="text" value="${c.business_name}" placeholder="e.g. Apex Enterprises" 
+                class="w-full bg-gray-900 p-4 rounded-2xl text-sm font-semibold text-white focus:outline-none focus:border-gold border border-gray-700 transition-all">
+            </div>
+          </div>
+
+          <button id="submit-audit-btn" class="w-full py-4 bg-gradient-to-r from-gold-dark via-gold to-gold-light text-black font-bold rounded-2xl text-xs uppercase tracking-wider shadow-lg active:scale-95 transition-transform">
+            See My Results →
+          </button>
+        </div>
+      `;
+
+      const backBtn = document.getElementById("back-to-questions-btn");
+      if (backBtn) {
+        backBtn.onclick = () => {
+          state.stage = "questions";
+          state.currentQuestionIndex = state.questions.length - 1;
+          saveState();
+          renderCurrentStage();
+        };
+      }
+
+      document.getElementById("submit-audit-btn").onclick = async () => {
+        const name = document.getElementById("contact-name").value.trim();
+        const phone = document.getElementById("contact-phone").value.trim();
+        const biz = document.getElementById("contact-biz").value.trim();
+
+        if (!name) {
+          showModal("Name Required", "Please enter your name to proceed.", "OK", null);
+          return;
+        }
+
+        if (!validateNigerianPhone(phone)) {
+          document.getElementById("phone-err").classList.remove("hidden");
+          return;
+        }
+
+        state.contact = { full_name: name, phone_number: phone, business_name: biz, email: "" };
+        saveState();
+
+        state.stage = "loading_analysis";
+        renderRotatingLoader(LOADING_MESSAGES_ANALYZE, () => {
+          state.stage = "results";
+          saveState();
+          renderCurrentStage();
+        });
+
+        const response = await apiAnalyzeBusiness(state.session_id, state.answers, state.contact);
+
+        if (response && response.result) {
+          state.result = response.result;
+          state.qualifies = response.qualifies !== undefined ? response.qualifies : true;
+          state.whatsapp_link = response.whatsapp_link || "";
+          if (activeLoadingController) {
+            activeLoadingController.finish(() => {
+              state.stage = "results";
+              state.result_reveal_index = 0;
+              saveState();
+              renderCurrentStage();
+            });
+          }
+        } else {
+          showModal(
+            "Analysis Timeout",
+            "Your answers are saved. Tap below to retry.",
+            "Retry Analysis",
+            () => renderContactScreen()
+          );
+        }
+      };
+    }
+
+    // --- SCREEN 4: GUIDED RESULTS REVEAL (ONE CARD PER SCREEN) ---
+    function renderResultsReveal() {
+      const container = document.getElementById("app-container");
+      const res = state.result;
+
+      if (!res) {
+        state.stage = "industry";
+        renderCurrentStage();
+        return;
+      }
+
+      const revealScreens = [
+        // 0: Summary
+        {
+          type: "headline",
+          render: () => `
+            <div class="glass-card-gold p-8 rounded-3xl text-center space-y-6">
+              <span class="text-[11px] font-bold uppercase tracking-widest text-gold px-3.5 py-1 rounded-full border border-gold/40 bg-gold/15">
+                AUDIT COMPLETE
+              </span>
+              <h2 class="font-cinzel text-2xl font-bold text-gold-light">
+                Executive Overview
+              </h2>
+              <p class="text-sm font-medium text-white leading-relaxed">
+                "${res.headline_summary}"
+              </p>
+            </div>
+          `
+        },
+        // 1: Score
+        {
+          type: "score",
+          render: () => `
+            <div class="glass-card p-8 rounded-3xl text-center space-y-6">
+              <span class="text-[11px] font-bold uppercase tracking-widest text-gold px-3.5 py-1 rounded-full border border-gold/30 bg-gold/10">
+                AUTOMATION SCORE
+              </span>
+              
+              <div class="relative w-44 h-44 mx-auto flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent"/>
+                  <circle id="score-circle" cx="50" cy="50" r="40" stroke="url(#goldGradient)" stroke-width="8" fill="transparent"
+                    stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" class="gauge-circle"/>
+                  <defs>
+                    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#B8860B" />
+                      <stop offset="50%" stop-color="#E5C158" />
+                      <stop offset="100%" stop-color="#FFF0B3" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                  <span class="text-4xl font-cinzel font-bold text-gold-metallic">${res.audit_score}</span>
+                  <span class="text-[10px] text-gray-400 font-bold uppercase">OUT OF 100</span>
+                </div>
+              </div>
+
+              <p class="text-xs text-gray-300 font-medium max-w-xs mx-auto">
+                Higher scores mean greater opportunity to recover lost sales using AI automation.
+              </p>
+            </div>
+          `
+        }
+      ];
+
+      // Leakage Cards
+      (res.leakage_cards || []).forEach((card) => {
+        revealScreens.push({
+          type: "leakage",
+          render: () => `
+            <div class="glass-card p-8 rounded-3xl space-y-6 text-center">
+              <span class="text-[11px] font-bold uppercase tracking-widest text-red-400 px-3.5 py-1 rounded-full border border-red-500/30 bg-red-500/10">
+                IDENTIFIED LEAK
+              </span>
+              <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wide">${card.title}</h3>
+              
+              <div class="py-2">
+                <div class="text-3xl sm:text-4xl font-cinzel font-bold text-gold-metallic">
+                  ${formatNGN(card.estimated_monthly_ngn)}
+                </div>
+                <div class="text-xs font-bold text-gray-400 mt-1 uppercase">ESTIMATED LOSS / MONTH</div>
+              </div>
+
+              <p class="text-xs font-medium text-white leading-relaxed">${card.explanation}</p>
+            </div>
+          `
+        });
+      });
+
+      // Headcount Savings
+      if (res.headcount_savings) {
+        revealScreens.push({
+          type: "headcount",
+          render: () => `
+            <div class="glass-card p-8 rounded-3xl space-y-6 text-center">
+              <span class="text-[11px] font-bold uppercase tracking-widest text-gold px-3.5 py-1 rounded-full border border-gold/30 bg-gold/10">
+                STAFF WORKLOAD SAVINGS
+              </span>
+              
+              <div>
+                <span class="text-xs text-gray-400 font-bold uppercase block mb-1">Workload Replaced</span>
+                <span class="text-xl font-cinzel font-bold text-gold-light">${res.headcount_savings.equivalent_roles_replaced}</span>
+              </div>
+
+              <div class="py-2">
+                <div class="text-3xl font-cinzel font-bold text-gold-metallic">
+                  ${formatNGN(res.headcount_savings.estimated_monthly_ngn_saved)}
+                </div>
+                <div class="text-xs font-bold text-gray-400 mt-1 uppercase">MONTHLY WORKTIME SAVED</div>
+              </div>
+
+              <p class="text-xs font-medium text-white leading-relaxed">${res.headcount_savings.explanation}</p>
+            </div>
+          `
+        });
+      }
+
+      // Total Impact
+      revealScreens.push({
+        type: "total",
+        render: () => `
+          <div class="glass-card-gold p-8 rounded-3xl text-center space-y-6">
+            <span class="text-[11px] font-bold uppercase tracking-widest text-gold px-3 py-1 rounded-full border border-gold/40 bg-gold/20">
+              RECOVERABLE REVENUE
+            </span>
+
+            <div class="py-2">
+              <div class="text-4xl sm:text-5xl font-cinzel font-bold text-gold-metallic">
+                ${formatNGN(res.total_estimated_monthly_impact_ngn)}
+              </div>
+              <div class="text-xs text-gold-light font-bold uppercase tracking-wide mt-2">TOTAL MONTHLY IMPACT</div>
+            </div>
+
+            <p class="text-xs font-medium text-gray-300 leading-relaxed">
+              Combining saved sales from fast replies and reduced staff workload.
+            </p>
+          </div>
+        `
+      });
+
+      // WhatsApp CTA Screen
+      revealScreens.push({
+        type: "final",
+        render: () => `
+          <div class="glass-card-gold p-8 rounded-3xl space-y-6 text-center">
+            <div class="w-14 h-14 mx-auto rounded-full bg-gold/20 border border-gold/40 flex items-center justify-center text-gold text-2xl font-bold">
+              ✦
+            </div>
+            
+            <div class="space-y-2">
+              <h3 class="font-cinzel text-2xl font-bold text-gold-light">Main Audit Finding</h3>
+              <p class="text-xs font-medium text-white leading-relaxed">${res.biggest_leak}</p>
+            </div>
+
+            <div class="space-y-4 pt-2">
+              <a href="${state.whatsapp_link || 'https://wa.me/2347085060716'}" target="_blank" rel="noopener"
+                class="block w-full py-4 px-6 bg-gradient-to-r from-gold-dark via-gold to-gold-light text-black font-bold rounded-2xl text-xs uppercase tracking-wider shadow-xl active:scale-95 transition-transform text-center">
+                Review Results on WhatsApp →
+              </a>
+              <p class="text-[11px] text-gray-400 font-medium">
+                Your score of <strong class="text-gold">${res.audit_score}/100</strong> is saved for your consultation.
+              </p>
+            </div>
+          </div>
+        `
+      });
+
+      const idx = Math.min(Math.max(0, state.result_reveal_index), revealScreens.length - 1);
+      state.totalResultsScreens = revealScreens.length;
+      saveState();
+
+      const isFirst = idx === 0;
+      const isLast = idx === revealScreens.length - 1;
+      const activeScreen = revealScreens[idx];
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          ${activeScreen.render()}
+
+          <div class="flex items-center justify-between pt-2">
+            ${
+              !isFirst ? `
+                <button id="prev-reveal-btn" class="px-5 py-3 rounded-2xl border border-gray-700 text-gray-300 font-bold text-xs uppercase tracking-wider hover:border-gold/40 transition-all">
+                  ← Back
+                </button>
+              ` : `<div></div>`
+            }
+
+            <span class="text-xs font-bold text-gold">
+              ${idx + 1} / ${revealScreens.length}
+            </span>
+
+            ${
+              !isLast ? `
+                <button id="next-reveal-btn" class="px-6 py-3 rounded-2xl bg-gold/15 border border-gold/40 text-gold-light font-bold text-xs uppercase tracking-wider hover:bg-gold/25 transition-all">
+                  Next →
+                </button>
+              ` : `<div></div>`
+            }
+          </div>
+        </div>
+      `;
+
+      if (activeScreen.type === "score") {
+        setTimeout(() => {
+          const circle = document.getElementById("score-circle");
+          if (circle) {
+            const score = res.audit_score || 50;
+            const offset = 251.2 - (score / 100) * 251.2;
+            circle.style.strokeDashoffset = offset;
+          }
+        }, 80);
+      }
+
+      const prevBtn = document.getElementById("prev-reveal-btn");
+      if (prevBtn) {
+        prevBtn.onclick = () => {
+          state.result_reveal_index--;
+          saveState();
+          renderCurrentStage();
+        };
+      }
+
+      const nextBtn = document.getElementById("next-reveal-btn");
+      if (nextBtn) {
+        nextBtn.onclick = () => {
+          state.result_reveal_index++;
+          saveState();
+          renderCurrentStage();
+        };
+      }
+    }
+
+    // --- MAIN ROUTER ---
+    function renderCurrentStage() {
+      updateHeaderStep();
+
+      switch (state.stage) {
+        case "resume_check":
+          renderResumeCheck();
+          break;
+        case "industry":
+          renderIndustrySelect();
+          break;
+        case "questions":
+          renderQuestionScreen();
+          break;
+        case "contact":
+          renderContactScreen();
+          break;
+        case "results":
+          renderResultsReveal();
+          break;
+        default:
+          renderIndustrySelect();
+      }
+    }
+
+    /* =====================================================================
+       7. BOOTSTRAP
+       ===================================================================== */
+    window.onload = function () {
+      const hasSaved = loadState();
+      if (hasSaved && state.session_id) {
+        state.stage = "resume_check";
+      } else {
+        state.stage = "industry";
+      }
+      renderCurrentStage();
+    };
+  </script>
+</body>
+</html>
