@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Intelligence Forms</title>
+    <link rel="icon" type="image/png" href="ii-logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- ============================================================
+         META PIXEL BASE CODE
+         Intentionally left empty — Adekani adds the real pixel ID and
+         any extra pixel setup here himself. The fbq() calls later in
+         this file already assume fbq exists once this is filled in,
+         and already guard for it being absent, so leaving this blank
+         is safe: the form will simply skip firing until this is added.
+         ============================================================ -->
+    <script>
+        // !function(f,b,e,v,n,t,s)
+        // {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        // n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        // if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        // n.queue=[];t=b.createElement(e);t.async=!0;
+        // t.src=v;s=b.getElementsByTagName(e)[0];
+        // s.parentNode.insertBefore(t,s)}(window, document,'script',
+        // 'https://connect.facebook.net/en_US/fbevents.js');
+        // fbq('init', 'YOUR_PIXEL_ID_HERE');
+        // fbq('track', 'PageView');
+    </script>
+    <noscript>
+        <!-- <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=YOUR_PIXEL_ID_HERE&ev=PageView&noscript=1" alt="fb-pixel" /> -->
+    </noscript>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Icon Intelligence palette: black + gold + a silver complement,
+               but the FORM SURFACE itself stays a soft, warm off-white so the
+               page is easy to read and navigate — not a dark theme. Black and
+               gold live in the header, accents, and selected states instead. */
+            --ii-black: #0A0A0A;
+            --ii-black-soft: #141414;
+            --gold: #D4AF37;
+            --gold-light: #F9E596;
+            --gold-dark: #AA771C;
+            --gold-dim: rgba(212, 175, 55, 0.12);
+            --silver: #9CA3AF;
+            --silver-light: #E5E7EB;
+            --silver-dark: #6B7280;
+            --metallic-gold: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            --page-bg: #F7F6F3;
+            --card-bg: #FFFFFF;
+            --ink: #1A1A1A;
+            --ink-muted: #5B5B5B;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--page-bg);
+            color: var(--ink);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .text-gold-shimmer {
+            background: var(--metallic-gold);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: goldShine 5s linear infinite;
+            display: inline-block;
+        }
+        @keyframes goldShine { to { background-position: 200% center; } }
+
+        @keyframes animatedGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .bg-animated-brand {
+            background: var(--metallic-gold);
+            background-size: 300% 300%;
+            animation: animatedGradient 10s ease infinite;
+        }
+
+        .auto-expand { min-height: 48px; resize: none; overflow-y: hidden; }
+        .touch-target { min-height: 48px; min-width: 48px; }
+
+        .choice-card-selected {
+            border-color: var(--gold) !important;
+            background-color: var(--gold-dim) !important;
+            box-shadow: 0 2px 10px rgba(212, 175, 55, 0.15);
+        }
+
+        .fade-in-up { animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #EDEBE6; }
+        ::-webkit-scrollbar-thumb { background: var(--silver); border-radius: 9999px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-amber-100">
+    <div>
+        <!-- Top Animated Gold Flourish -->
+        <div class="h-1.5 w-full bg-animated-brand"></div>
+
+        <!-- Sticky Navigation Header — black bar for brand contrast against the light form surface -->
+        <header class="sticky top-0 z-30 backdrop-blur-md border-b" style="background-color: rgba(10,10,10,0.96); border-color: #262626;">
+            <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <img src="ii-logo.png" alt="Icon Intelligence" class="h-9 w-auto object-contain" onerror="this.onerror=null;this.src='https://icon-intelligence.com/ii-logo.png';">
+                    <span class="text-xs font-bold uppercase tracking-wider pl-3 hidden sm:inline-block border-l" style="color: var(--silver); border-color: #2A2A2A;">Official Form</span>
+                </div>
+                <div id="draft-indicator" class="hidden items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border" style="color: var(--gold-light); background: rgba(212,175,55,0.1); border-color: rgba(212,175,55,0.3);">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Draft Saved
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-2xl mx-auto px-4 py-6 sm:py-8 w-full">
+
+            <!-- Loading Spinner State -->
+            <div id="state-loading" class="py-20 text-center flex flex-col items-center justify-center">
+                <div class="relative w-12 h-12">
+                    <div class="absolute inset-0 rounded-full border-4" style="border-color: #EAE7DF;"></div>
+                    <div class="absolute inset-0 rounded-full border-4 border-l-transparent animate-spin" style="border-top-color: var(--gold); border-right-color: var(--silver); border-bottom-color: var(--gold-dark);"></div>
+                </div>
+                <p class="mt-4 text-sm font-semibold" style="color: var(--ink-muted);">Loading form...</p>
+            </div>
+
+            <!-- Unavailable State -->
+            <div id="state-unavailable" class="hidden py-12 px-6 rounded-2xl border shadow-sm text-center" style="background: var(--card-bg); border-color: #EAE7DF;">
+                <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style="background: #FBEAEA; color: #C0392B;">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <h1 class="text-2xl font-extrabold" style="color: var(--ink);">Form Unavailable</h1>
+                <p class="mt-2 max-w-md mx-auto text-sm sm:text-base" style="color: var(--ink-muted);">This form isn't available right now. It may have been closed, moved, or the link might be incorrect.</p>
+                <div class="mt-6">
+                    <a href="https://icon-intelligence.com" class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition" style="background: var(--ii-black);">Return to Home</a>
+                </div>
+            </div>
+
+            <div id="state-form" class="hidden space-y-6">
+
+                <!-- Form Level Header Intro -->
+                <div id="form-header-intro" class="hidden p-6 sm:p-8 rounded-2xl border shadow-sm space-y-4" style="background: var(--card-bg); border-color: #EAE7DF;">
+                    <div id="form-cover-image-wrap" class="hidden overflow-hidden rounded-xl max-h-96 mb-4 flex items-center justify-center" style="background: #F1EFEA;">
+                        <img id="form-cover-image" src="" alt="Form Header Image" class="w-full h-auto max-h-96 object-contain">
+                    </div>
+                    <h1 id="form-title" class="text-2xl sm:text-3xl font-black tracking-tight" style="color: var(--ink);"></h1>
+                    <p id="form-description" class="text-sm sm:text-base whitespace-pre-line leading-relaxed" style="color: var(--ink-muted);"></p>
+                </div>
+
+                <!-- Progress Header -->
+                <div id="progress-container" class="p-4 rounded-2xl border shadow-sm" style="background: var(--card-bg); border-color: #EAE7DF;">
+                    <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--silver-dark);">
+                        <span id="stage-indicator-text">Stage 1 of 1</span>
+                        <span id="progress-percent-text" style="color: var(--gold-dark);">0%</span>
+                    </div>
+                    <div class="w-full h-2.5 rounded-full overflow-hidden" style="background: #EFECE4;">
+                        <div id="progress-bar" class="h-full bg-animated-brand transition-all duration-300 rounded-full" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Stage Content Card -->
+                <div id="stage-card" class="p-6 sm:p-8 rounded-2xl border shadow-sm space-y-6 fade-in-up" style="background: var(--card-bg); border-color: #EAE7DF;">
+
+                    <div id="stage-header" class="space-y-2 border-b pb-4" style="border-color: #F0EDE6;">
+                        <div id="stage-image-wrap" class="hidden overflow-hidden rounded-xl max-h-80 mb-4 flex items-center justify-center" style="background: #F1EFEA;">
+                            <img id="stage-image" src="" alt="Stage Visual" class="w-full h-auto max-h-80 object-contain">
+                        </div>
+                        <h2 id="stage-title" class="text-xl sm:text-2xl font-bold" style="color: var(--ink);"></h2>
+                        <p id="stage-description" class="text-sm whitespace-pre-line leading-relaxed" style="color: var(--ink-muted);"></p>
+                    </div>
+
+                    <div id="fields-container" class="space-y-6"></div>
+
+                    <div id="error-banner" class="hidden p-4 rounded-xl text-sm leading-relaxed flex items-start gap-3" style="background: #FEF6E7; border: 1px solid #F3DFA8; color: #6B4E12;">
+                        <svg class="w-5 h-5 shrink-0 mt-0.5" style="color: var(--gold-dark);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <div id="error-banner-text"></div>
+                    </div>
+
+                    <div class="pt-4 border-t flex items-center justify-between gap-3" style="border-color: #F0EDE6;">
+                        <button id="btn-back" type="button" class="hidden touch-target px-5 py-3 rounded-xl border font-semibold transition active:scale-[0.98]" style="border-color: #D8D4CB; color: var(--ink);">
+                            Back
+                        </button>
+                        <div class="flex-1"></div>
+                        <button id="btn-next" type="button" class="touch-target px-6 py-3 rounded-xl text-black font-bold shadow-md transition active:scale-[0.98] flex items-center justify-center gap-2" style="background: var(--metallic-gold);">
+                            <span>Next Stage</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </button>
+                        <button id="btn-submit" type="button" class="hidden touch-target px-7 py-3 rounded-xl text-black font-bold shadow-lg transition active:scale-[0.98] flex items-center justify-center gap-2" style="background: var(--metallic-gold);">
+                            <span id="btn-submit-label">Submit Form</span>
+                            <svg id="btn-submit-spinner" class="hidden animate-spin w-4 h-4 text-black" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="state-completion" class="hidden p-8 sm:p-10 rounded-2xl border shadow-md text-center space-y-6 fade-in-up" style="background: var(--card-bg); border-color: #EAE7DF;">
+                <div id="completion-image-wrap" class="hidden overflow-hidden rounded-xl max-h-80 mx-auto flex items-center justify-center" style="background: #F1EFEA;">
+                    <img id="completion-image" src="" alt="Completion Visual" class="w-full h-auto max-h-80 object-contain">
+                </div>
+                <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto ring-8" style="background: var(--gold-dim); color: var(--gold-dark); ring-color: rgba(212,175,55,0.08);">
+                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <div class="space-y-2">
+                    <h2 id="completion-title" class="text-2xl sm:text-3xl font-black" style="color: var(--ink);">Thank You!</h2>
+                    <p id="completion-message" class="text-sm sm:text-base leading-relaxed max-w-md mx-auto whitespace-pre-line" style="color: var(--ink-muted);">Your submission has been successfully received.</p>
+                </div>
+                <div id="completion-action-area" class="hidden pt-2">
+                    <a id="completion-link-btn" href="#" target="_blank" class="inline-flex items-center justify-center touch-target px-8 py-3.5 rounded-xl text-black font-bold shadow-md transition active:scale-[0.98] gap-2" style="background: var(--metallic-gold);">
+                        <span id="completion-link-label">Continue</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                    <p id="redirect-timer-text" class="hidden text-xs mt-3 font-medium" style="color: var(--ink-muted);"></p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <footer class="py-6 text-center text-xs font-medium" style="color: var(--silver-dark);">
+        <p>Powered by <span class="font-bold text-gold-shimmer">Icon Intelligence</span></p>
+    </footer>
+
+    <script>
+        // ---- Supabase Initialization ----
+        const SUPABASE_URL = 'https://xsdudtnszfszlvjpqrij.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzZHVkdG5zemZzemx2anBxcmlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NjkwOTIsImV4cCI6MjA4NzE0NTA5Mn0.v51jTNwUGBMzX4PlAdBMNSj25XBVirLhiqStKSsFBuw';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // State variables
+        let formId = null;
+        let formData = null;
+        let formStages = [];
+        let formFieldsByStage = {};
+        let currentStageIndex = 0;
+        let userAnswers = {};
+        let localStorageKey = '';
+
+        // DOM elements
+        const stateLoading = document.getElementById('state-loading');
+        const stateUnavailable = document.getElementById('state-unavailable');
+        const stateForm = document.getElementById('state-form');
+        const stateCompletion = document.getElementById('state-completion');
+        const formHeaderIntro = document.getElementById('form-header-intro');
+        const formTitle = document.getElementById('form-title');
+        const formDescription = document.getElementById('form-description');
+        const formCoverImageWrap = document.getElementById('form-cover-image-wrap');
+        const formCoverImage = document.getElementById('form-cover-image');
+        const stageIndicatorText = document.getElementById('stage-indicator-text');
+        const progressPercentText = document.getElementById('progress-percent-text');
+        const progressBar = document.getElementById('progress-bar');
+        const stageTitle = document.getElementById('stage-title');
+        const stageDescription = document.getElementById('stage-description');
+        const stageImageWrap = document.getElementById('stage-image-wrap');
+        const stageImage = document.getElementById('stage-image');
+        const fieldsContainer = document.getElementById('fields-container');
+        const btnBack = document.getElementById('btn-back');
+        const btnNext = document.getElementById('btn-next');
+        const btnSubmit = document.getElementById('btn-submit');
+        const btnSubmitLabel = document.getElementById('btn-submit-label');
+        const btnSubmitSpinner = document.getElementById('btn-submit-spinner');
+        const errorBanner = document.getElementById('error-banner');
+        const errorBannerText = document.getElementById('error-banner-text');
+        const draftIndicator = document.getElementById('draft-indicator');
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            formId = urlParams.get('id');
+            if (!formId) {
+                showUnavailable();
+                return;
+            }
+            localStorageKey = `ii_form_draft_${formId}`;
+            await loadForm();
+        });
+
+        async function loadForm() {
+            try {
+                const { data: form, error: formErr } = await supabaseClient
+                    .from('forms')
+                    .select('*')
+                    .eq('id', formId)
+                    .single();
+
+                if (formErr || !form || form.status !== 'live') {
+                    showUnavailable();
+                    return;
+                }
+                formData = form;
+
+                const { data: stages, error: stagesErr } = await supabaseClient
+                    .from('form_stages')
+                    .select('*')
+                    .eq('form_id', formId)
+                    .order('order', { ascending: true });
+
+                if (stagesErr || !stages || stages.length === 0) {
+                    showUnavailable();
+                    return;
+                }
+                formStages = stages;
+
+                const { data: fields, error: fieldsErr } = await supabaseClient
+                    .from('form_fields')
+                    .select('*')
+                    .eq('form_id', formId)
+                    .order('order', { ascending: true });
+
+                if (fieldsErr) {
+                    showUnavailable();
+                    return;
+                }
+
+                formFieldsByStage = {};
+                formStages.forEach(s => { formFieldsByStage[s.id] = []; });
+                (fields || []).forEach(f => {
+                    if (formFieldsByStage[f.stage_id]) {
+                        formFieldsByStage[f.stage_id].push(f);
+                    }
+                });
+
+                restoreDraft();
+                renderFormIntro();
+                renderStage(0);
+                stateLoading.classList.add('hidden');
+                stateForm.classList.remove('hidden');
+
+            } catch (err) {
+                console.error("Error loading form:", err);
+                showUnavailable();
+            }
+        }
+
+        function showUnavailable() {
+            stateLoading.classList.add('hidden');
+            stateForm.classList.add('hidden');
+            stateCompletion.classList.add('hidden');
+            stateUnavailable.classList.remove('hidden');
+        }
+
+        function restoreDraft() {
+            try {
+                const saved = localStorage.getItem(localStorageKey);
+                if (saved) {
+                    userAnswers = JSON.parse(saved);
+                    draftIndicator.classList.remove('hidden');
+                    draftIndicator.classList.add('flex');
+                } else {
+                    userAnswers = {};
+                }
+            } catch (e) {
+                userAnswers = {};
+            }
+        }
+
+        function saveAnswer(fieldId, value) {
+            userAnswers[fieldId] = value;
+            try {
+                localStorage.setItem(localStorageKey, JSON.stringify(userAnswers));
+                draftIndicator.classList.remove('hidden');
+                draftIndicator.classList.add('flex');
+            } catch (e) {
+                console.warn('Could not save draft to localStorage');
+            }
+            hideErrorBanner();
+        }
+
+        function renderFormIntro() {
+            if (formData.description || formData.image_url) {
+                formTitle.textContent = formData.title;
+                if (formData.description) {
+                    formDescription.textContent = formData.description;
+                    formDescription.classList.remove('hidden');
+                } else {
+                    formDescription.classList.add('hidden');
+                }
+                if (formData.image_url) {
+                    formCoverImage.src = formData.image_url;
+                    formCoverImageWrap.classList.remove('hidden');
+                } else {
+                    formCoverImageWrap.classList.add('hidden');
+                }
+                formHeaderIntro.classList.remove('hidden');
+            } else {
+                formHeaderIntro.classList.add('hidden');
+            }
+        }
+
+        function renderStage(index) {
+            currentStageIndex = index;
+            const stage = formStages[currentStageIndex];
+            const fields = formFieldsByStage[stage.id] || [];
+
+            const totalStages = formStages.length;
+            const progressPct = Math.round(((currentStageIndex + 1) / totalStages) * 100);
+            stageIndicatorText.textContent = `Stage ${currentStageIndex + 1} of ${totalStages}`;
+            progressPercentText.textContent = `${progressPct}%`;
+            progressBar.style.width = `${progressPct}%`;
+
+            stageTitle.textContent = stage.title || `Stage ${currentStageIndex + 1}`;
+            if (stage.description) {
+                stageDescription.textContent = stage.description;
+                stageDescription.classList.remove('hidden');
+            } else {
+                stageDescription.classList.add('hidden');
+            }
+            if (stage.image_url) {
+                stageImage.src = stage.image_url;
+                stageImageWrap.classList.remove('hidden');
+            } else {
+                stageImageWrap.classList.add('hidden');
+            }
+
+            fieldsContainer.innerHTML = '';
+            fields.forEach(field => {
+                const fieldEl = renderField(field);
+                fieldsContainer.appendChild(fieldEl);
+            });
+
+            if (currentStageIndex === 0) {
+                btnBack.classList.add('hidden');
+            } else {
+                btnBack.classList.remove('hidden');
+            }
+            if (currentStageIndex === totalStages - 1) {
+                btnNext.classList.add('hidden');
+                btnSubmit.classList.remove('hidden');
+            } else {
+                btnNext.classList.remove('hidden');
+                btnSubmit.classList.add('hidden');
+            }
+
+            hideErrorBanner();
+            document.querySelectorAll('textarea.auto-expand').forEach(ta => autoExpandTextarea(ta));
+            document.getElementById('progress-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function renderField(field) {
+            const wrapper = document.createElement('div');
+            wrapper.className = "space-y-2 border-b pb-5 last:border-0 last:pb-0";
+            wrapper.style.borderColor = '#F0EDE6';
+            wrapper.id = `field-wrap-${field.id}`;
+
+            const labelEl = document.createElement('label');
+            labelEl.className = "block text-sm font-bold leading-snug";
+            labelEl.style.color = 'var(--ink)';
+            labelEl.innerHTML = `${escapeHtml(field.label)}${field.required ? ' <span class="font-bold" style="color: var(--gold-dark);">*</span>' : ''}`;
+            wrapper.appendChild(labelEl);
+
+            const val = userAnswers[field.id];
+
+            switch (field.field_type) {
+                case 'short_text': {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = "w-full touch-target px-4 py-3 rounded-xl border outline-none transition text-base";
+                    input.style.cssText = "border-color:#D8D4CB; color:var(--ink); background:#FFFFFF;";
+                    input.addEventListener('focus', () => { input.style.borderColor = 'var(--gold)'; input.style.boxShadow = '0 0 0 3px rgba(212,175,55,0.12)'; });
+                    input.addEventListener('blur', () => { input.style.borderColor = '#D8D4CB'; input.style.boxShadow = 'none'; });
+                    input.placeholder = "Your response...";
+                    input.value = val || '';
+                    input.addEventListener('input', (e) => saveAnswer(field.id, e.target.value));
+                    wrapper.appendChild(input);
+                    break;
+                }
+                case 'long_text': {
+                    const textarea = document.createElement('textarea');
+                    textarea.className = "w-full auto-expand px-4 py-3 rounded-xl border outline-none transition text-base leading-relaxed";
+                    textarea.style.cssText = "border-color:#D8D4CB; color:var(--ink); background:#FFFFFF;";
+                    textarea.addEventListener('focus', () => { textarea.style.borderColor = 'var(--gold)'; textarea.style.boxShadow = '0 0 0 3px rgba(212,175,55,0.12)'; });
+                    textarea.addEventListener('blur', () => { textarea.style.borderColor = '#D8D4CB'; textarea.style.boxShadow = 'none'; });
+                    textarea.placeholder = "Type your response here...";
+                    textarea.rows = 2;
+                    textarea.value = val || '';
+                    textarea.addEventListener('input', (e) => {
+                        autoExpandTextarea(e.target);
+                        saveAnswer(field.id, e.target.value);
+                    });
+                    wrapper.appendChild(textarea);
+                    break;
+                }
+                case 'radio': {
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.className = "space-y-2.5 pt-1";
+                    let currentChoice = typeof val === 'object' ? val.choice : val;
+                    let currentOtherText = typeof val === 'object' ? val.other_text : '';
+                    const optionsList = Array.isArray(field.options) ? [...field.options] : [];
+                    if (field.allow_other && !optionsList.includes('Other')) optionsList.push('Other');
+
+                    const otherWrap = document.createElement('div');
+                    otherWrap.className = `pt-2 ${currentChoice === 'Other' ? '' : 'hidden'}`;
+                    const otherInput = document.createElement('input');
+                    otherInput.type = 'text';
+                    otherInput.placeholder = "Please specify...";
+                    otherInput.className = "w-full touch-target px-4 py-3 rounded-xl border outline-none text-sm";
+                    otherInput.style.cssText = "border-color:#D8D4CB; color:var(--ink); background:#FFFFFF;";
+                    otherInput.value = currentOtherText;
+                    otherInput.addEventListener('input', (e) => {
+                        saveAnswer(field.id, { choice: 'Other', other_text: e.target.value });
+                    });
+                    otherWrap.appendChild(otherInput);
+
+                    optionsList.forEach((optText) => {
+                        const optionBtn = document.createElement('div');
+                        const isSelected = currentChoice === optText;
+                        optionBtn.className = `touch-target flex items-center px-4 py-3 rounded-xl border cursor-pointer transition select-none ${isSelected ? 'choice-card-selected' : ''}`;
+                        if (!isSelected) optionBtn.style.cssText = "border-color:#E3E0D8; background:#FFFFFF;";
+                        optionBtn.innerHTML = `
+                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center mr-3 shrink-0" style="${isSelected ? 'border-color:var(--gold); background:var(--gold);' : 'border-color:#C7C3B8;'}">
+                                <div class="w-2 h-2 rounded-full bg-white ${isSelected ? 'block' : 'hidden'}"></div>
+                            </div>
+                            <span class="text-sm font-semibold" style="color: var(--ink);">${escapeHtml(optText)}</span>
+                        `;
+                        optionBtn.addEventListener('click', () => {
+                            if (optText === 'Other') {
+                                otherWrap.classList.remove('hidden');
+                                saveAnswer(field.id, { choice: 'Other', other_text: otherInput.value });
+                            } else {
+                                otherWrap.classList.add('hidden');
+                                saveAnswer(field.id, optText);
+                            }
+                            renderStage(currentStageIndex);
+                        });
+                        optionsContainer.appendChild(optionBtn);
+                    });
+                    optionsContainer.appendChild(otherWrap);
+                    wrapper.appendChild(optionsContainer);
+                    break;
+                }
+                case 'checkbox': {
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.className = "space-y-2.5 pt-1";
+                    let selectedArr = Array.isArray(val) ? [...val] : [];
+                    const optionsList = Array.isArray(field.options) ? [...field.options] : [];
+                    if (field.allow_other && !optionsList.includes('Other')) optionsList.push('Other');
+
+                    optionsList.forEach((optText) => {
+                        const isChecked = selectedArr.some(item => (typeof item === 'string' && item === optText) || (typeof item === 'object' && item.choice === 'Other' && optText === 'Other'));
+                        const optionBtn = document.createElement('div');
+                        optionBtn.className = `touch-target flex items-center px-4 py-3 rounded-xl border cursor-pointer transition select-none ${isChecked ? 'choice-card-selected' : ''}`;
+                        if (!isChecked) optionBtn.style.cssText = "border-color:#E3E0D8; background:#FFFFFF;";
+                        optionBtn.innerHTML = `
+                            <div class="w-5 h-5 rounded-md border-2 flex items-center justify-center mr-3 shrink-0" style="${isChecked ? 'border-color:var(--gold); background:var(--gold);' : 'border-color:#C7C3B8;'}">
+                                <svg class="w-3.5 h-3.5 text-white ${isChecked ? 'block' : 'hidden'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <span class="text-sm font-semibold" style="color: var(--ink);">${escapeHtml(optText)}</span>
+                        `;
+                        optionBtn.addEventListener('click', () => {
+                            if (isChecked) {
+                                selectedArr = selectedArr.filter(item => {
+                                    if (typeof item === 'string') return item !== optText;
+                                    if (typeof item === 'object') return item.choice !== 'Other';
+                                    return true;
+                                });
+                            } else {
+                                if (optText === 'Other') {
+                                    selectedArr.push({ choice: 'Other', other_text: '' });
+                                } else {
+                                    selectedArr.push(optText);
+                                }
+                            }
+                            saveAnswer(field.id, selectedArr);
+                            renderStage(currentStageIndex);
+                        });
+                        optionsContainer.appendChild(optionBtn);
+
+                        if (optText === 'Other' && isChecked) {
+                            const otherWrap = document.createElement('div');
+                            otherWrap.className = "pt-1 pl-8";
+                            const otherObj = selectedArr.find(item => typeof item === 'object' && item.choice === 'Other') || { choice: 'Other', other_text: '' };
+                            const otherInput = document.createElement('input');
+                            otherInput.type = 'text';
+                            otherInput.placeholder = "Please specify...";
+                            otherInput.className = "w-full touch-target px-4 py-2.5 rounded-xl border outline-none text-sm";
+                            otherInput.style.cssText = "border-color:#D8D4CB; color:var(--ink); background:#FFFFFF;";
+                            otherInput.value = otherObj.other_text || '';
+                            otherInput.addEventListener('input', (e) => {
+                                otherObj.other_text = e.target.value;
+                                saveAnswer(field.id, selectedArr);
+                            });
+                            otherWrap.appendChild(otherInput);
+                            optionsContainer.appendChild(otherWrap);
+                        }
+                    });
+                    wrapper.appendChild(optionsContainer);
+                    break;
+                }
+                case 'yes_no': {
+                    const btnGrid = document.createElement('div');
+                    btnGrid.className = "grid grid-cols-2 gap-3 pt-1";
+                    ['Yes', 'No'].forEach(choiceOption => {
+                        const isSelected = val === choiceOption;
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = `touch-target py-3 px-4 rounded-xl font-bold text-base border transition flex items-center justify-center gap-2`;
+                        btn.style.cssText = isSelected
+                            ? "background: var(--ii-black); color: #fff; border-color: var(--ii-black); box-shadow: 0 2px 8px rgba(0,0,0,0.15);"
+                            : "background: #FFFFFF; color: var(--ink); border-color: #E3E0D8;";
+                        btn.innerHTML = choiceOption;
+                        btn.addEventListener('click', () => {
+                            saveAnswer(field.id, choiceOption);
+                            renderStage(currentStageIndex);
+                        });
+                        btnGrid.appendChild(btn);
+                    });
+                    wrapper.appendChild(btnGrid);
+                    break;
+                }
+                case 'date': {
+                    const input = document.createElement('input');
+                    input.type = 'date';
+                    input.className = "w-full touch-target px-4 py-3 rounded-xl border outline-none transition text-base";
+                    input.style.cssText = "border-color:#D8D4CB; color:var(--ink); background:#FFFFFF;";
+                    input.value = val || '';
+                    input.addEventListener('input', (e) => saveAnswer(field.id, e.target.value));
+                    wrapper.appendChild(input);
+                    break;
+                }
+                case 'time': {
+                    const input = document.createElement('input');
+                    input.type = 'time';
+                    input.className = "w-full touch-target px-4 py-3 rounded-xl border outline-none transition text-base";
+                    input.style.cssText = "border-color:#D8D4CB; color:var(--ink); background:#FFFFFF;";
+                    input.value = val || '';
+                    input.addEventListener('input', (e) => saveAnswer(field.id, e.target.value));
+                    wrapper.appendChild(input);
+                    break;
+                }
+            }
+            return wrapper;
+        }
+
+        function autoExpandTextarea(el) {
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight + 2) + 'px';
+        }
+
+        btnNext.addEventListener('click', () => {
+            if (validateCurrentStage()) {
+                renderStage(currentStageIndex + 1);
+            }
+        });
+        btnBack.addEventListener('click', () => {
+            if (currentStageIndex > 0) {
+                renderStage(currentStageIndex - 1);
+            }
+        });
+
+        function isFieldFilled(ans) {
+            if (ans === undefined || ans === null) return false;
+            if (typeof ans === 'string' && ans.trim().length > 0) return true;
+            if (Array.isArray(ans) && ans.length > 0) return true;
+            if (typeof ans === 'object' && !Array.isArray(ans) && ans.choice) return true;
+            return false;
+        }
+
+        function validateCurrentStage() {
+            const currentStage = formStages[currentStageIndex];
+            const fields = formFieldsByStage[currentStage.id] || [];
+            let isValid = true;
+            let firstMissingFieldId = null;
+
+            for (const field of fields) {
+                if (field.required && !isFieldFilled(userAnswers[field.id])) {
+                    isValid = false;
+                    if (!firstMissingFieldId) firstMissingFieldId = field.id;
+                }
+            }
+
+            if (!isValid) {
+                showErrorBanner('Please fill out all required fields before continuing.');
+                if (firstMissingFieldId) {
+                    const el = document.getElementById(`field-wrap-${firstMissingFieldId}`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return false;
+            }
+            hideErrorBanner();
+            return true;
+        }
+
+        function validateAllStages() {
+            for (let i = 0; i < formStages.length; i++) {
+                const stage = formStages[i];
+                const fields = formFieldsByStage[stage.id] || [];
+                for (const field of fields) {
+                    if (field.required && !isFieldFilled(userAnswers[field.id])) {
+                        renderStage(i);
+                        showErrorBanner('Please complete this required field before submitting.');
+                        const el = document.getElementById(`field-wrap-${field.id}`);
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        // ============================================================
+        // SUBMISSION — this is the piece that must stay in sync with the
+        // pixel-logic system. We call submit_form_response(), a database
+        // function that:
+        //   1. Re-checks the form is still live (server-side, can't be spoofed)
+        //   2. Evaluates this form's pixel rules (if it's in conditional mode)
+        //      against the submitted answers
+        //   3. Inserts the response with pixel_qualified already computed
+        //   4. Returns { response_id, pixel_qualified }
+        // We never insert into form_responses directly and never decide
+        // pixel_qualified in the browser — the server is the source of
+        // truth so the rule can't be bypassed or duplicated client-side.
+        // ============================================================
+        btnSubmit.addEventListener('click', async () => {
+            if (!validateAllStages()) return;
+            setSubmitting(true);
+
+            try {
+                const { data: result, error: submitErr } = await supabaseClient
+                    .rpc('submit_form_response', { p_form_id: formId, p_answers: userAnswers });
+
+                if (submitErr) throw submitErr;
+
+                const responseId = result?.response_id;
+                const pixelQualified = result?.pixel_qualified === true;
+
+                localStorage.removeItem(localStorageKey);
+
+                // Fire the Meta Pixel only when this response qualifies.
+                // A form in "plain" mode has no pixel rules at all, and
+                // evaluate_pixel_qualification() returns true with no rules
+                // to check — so plain forms always qualify and conditional
+                // forms only qualify when their AND/OR rules are satisfied.
+                // The pixel event name is per-form (forms.pixel_event),
+                // defaulting to "Lead" if not set.
+                if (pixelQualified && typeof fbq === 'function') {
+                    const eventName = formData.pixel_event || 'Lead';
+                    fbq('track', eventName);
+                }
+
+                // Notify subscribed admins in the background (non-blocking).
+                if (responseId) {
+                    fetch(`${SUPABASE_URL}/functions/v1/notification-system`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+                        },
+                        body: JSON.stringify({ response_id: responseId })
+                    }).then(res => {
+                        if (!res.ok) res.text().then(t => console.error("Notification call failed:", res.status, t));
+                    }).catch(e => console.error("Notification background call network error:", e));
+                }
+
+                renderCompletionScreen();
+
+            } catch (err) {
+                console.error("Submission failed:", err);
+                showErrorBanner('Network error saving response. Your answers remain safely saved on your device. Please try again.');
+            } finally {
+                setSubmitting(false);
+            }
+        });
+
+        function setSubmitting(isSubmitting) {
+            if (isSubmitting) {
+                btnSubmit.disabled = true;
+                btnSubmitLabel.textContent = "Submitting...";
+                btnSubmitSpinner.classList.remove('hidden');
+            } else {
+                btnSubmit.disabled = false;
+                btnSubmitLabel.textContent = "Submit Form";
+                btnSubmitSpinner.classList.add('hidden');
+            }
+        }
+
+        function renderCompletionScreen() {
+            stateForm.classList.add('hidden');
+            stateCompletion.classList.remove('hidden');
+
+            const compMsg = formData.completion_message;
+            const compImg = formData.completion_image_url;
+            const compLink = formData.completion_link_url;
+            const compLabel = formData.completion_link_label || 'Continue';
+            const mode = formData.completion_redirect_mode;
+            const delay = formData.completion_redirect_delay_seconds || 5;
+
+            const completionMessage = document.getElementById('completion-message');
+            const completionImageWrap = document.getElementById('completion-image-wrap');
+            const completionImage = document.getElementById('completion-image');
+            const completionActionArea = document.getElementById('completion-action-area');
+            const completionLinkBtn = document.getElementById('completion-link-btn');
+            const completionLinkLabel = document.getElementById('completion-link-label');
+            const redirectTimerText = document.getElementById('redirect-timer-text');
+
+            if (compMsg) completionMessage.textContent = compMsg;
+
+            if (compImg) {
+                completionImage.src = compImg;
+                completionImageWrap.classList.remove('hidden');
+            }
+
+            if (compLink && mode) {
+                completionLinkBtn.href = compLink;
+                completionLinkLabel.textContent = compLabel;
+                completionActionArea.classList.remove('hidden');
+
+                if (mode === 'auto') {
+                    redirectTimerText.classList.remove('hidden');
+                    let secondsLeft = delay;
+                    redirectTimerText.textContent = `Redirecting in ${secondsLeft} seconds...`;
+                    const timer = setInterval(() => {
+                        secondsLeft--;
+                        if (secondsLeft <= 0) {
+                            clearInterval(timer);
+                            window.location.href = compLink;
+                        } else {
+                            redirectTimerText.textContent = `Redirecting in ${secondsLeft} seconds...`;
+                        }
+                    }, 1000);
+                }
+            }
+        }
+
+        function showErrorBanner(msg) {
+            errorBannerText.textContent = msg;
+            errorBanner.classList.remove('hidden');
+        }
+        function hideErrorBanner() {
+            errorBanner.classList.add('hidden');
+        }
+
+        function escapeHtml(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
