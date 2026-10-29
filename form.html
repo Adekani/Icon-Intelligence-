@@ -8,29 +8,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- ============================================================
-         META PIXEL BASE CODE
-         Intentionally left empty — Adekani adds the real pixel ID and
-         any extra pixel setup here himself. The fbq() calls later in
-         this file already assume fbq exists once this is filled in,
-         and already guard for it being absent, so leaving this blank
-         is safe: the form will simply skip firing until this is added.
-         ============================================================ -->
+    <!-- Meta Pixel Code -->
     <script>
-        // !function(f,b,e,v,n,t,s)
-        // {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        // n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        // if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        // n.queue=[];t=b.createElement(e);t.async=!0;
-        // t.src=v;s=b.getElementsByTagName(e)[0];
-        // s.parentNode.insertBefore(t,s)}(window, document,'script',
-        // 'https://connect.facebook.net/en_US/fbevents.js');
-        // fbq('init', 'YOUR_PIXEL_ID_HERE');
-        // fbq('track', 'PageView');
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '29261540860200918');
+    fbq('track', 'PageView');
     </script>
-    <noscript>
-        <!-- <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=YOUR_PIXEL_ID_HERE&ev=PageView&noscript=1" alt="fb-pixel" /> -->
-    </noscript>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=29261540860200918&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -760,7 +754,7 @@
                     }).catch(e => console.error("Notification background call network error:", e));
                 }
 
-                renderCompletionScreen();
+                renderCompletionScreen(pixelQualified);
 
             } catch (err) {
                 console.error("Submission failed:", err);
@@ -782,16 +776,18 @@
             }
         }
 
-        function renderCompletionScreen() {
+        // When a submission doesn't qualify for the pixel, we deliberately
+        // skip the form's configured (Supabase) completion content and show
+        // this plain fallback instead, with a simple link back to the
+        // website. Keeps non-qualifying submitters from seeing offer/thank-you
+        // content that was meant for qualifying leads.
+        const GENERIC_COMPLETION_MESSAGE = 'Thank you for filling out the form.';
+        const GENERIC_COMPLETION_LINK_URL = 'https://icon-intelligence.com';
+        const GENERIC_COMPLETION_LINK_LABEL = 'View our website';
+
+        function renderCompletionScreen(pixelQualified) {
             stateForm.classList.add('hidden');
             stateCompletion.classList.remove('hidden');
-
-            const compMsg = formData.completion_message;
-            const compImg = formData.completion_image_url;
-            const compLink = formData.completion_link_url;
-            const compLabel = formData.completion_link_label || 'Continue';
-            const mode = formData.completion_redirect_mode;
-            const delay = formData.completion_redirect_delay_seconds || 5;
 
             const completionMessage = document.getElementById('completion-message');
             const completionImageWrap = document.getElementById('completion-image-wrap');
@@ -800,6 +796,27 @@
             const completionLinkBtn = document.getElementById('completion-link-btn');
             const completionLinkLabel = document.getElementById('completion-link-label');
             const redirectTimerText = document.getElementById('redirect-timer-text');
+
+            // Always reset these first so a previous render (or a stray
+            // formData value) can't leak into the wrong branch.
+            completionImageWrap.classList.add('hidden');
+            completionActionArea.classList.add('hidden');
+            redirectTimerText.classList.add('hidden');
+
+            if (!pixelQualified) {
+                completionMessage.textContent = GENERIC_COMPLETION_MESSAGE;
+                completionLinkBtn.href = GENERIC_COMPLETION_LINK_URL;
+                completionLinkLabel.textContent = GENERIC_COMPLETION_LINK_LABEL;
+                completionActionArea.classList.remove('hidden');
+                return;
+            }
+
+            const compMsg = formData.completion_message;
+            const compImg = formData.completion_image_url;
+            const compLink = formData.completion_link_url;
+            const compLabel = formData.completion_link_label || 'Continue';
+            const mode = formData.completion_redirect_mode;
+            const delay = formData.completion_redirect_delay_seconds || 5;
 
             if (compMsg) completionMessage.textContent = compMsg;
 
